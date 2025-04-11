@@ -21,7 +21,6 @@ const Login = () => {
             content: response?.message || "Login Success",
           })
         );
-        localStorage.setItem("tokenForBMS", response?.data);
         navigate("/");
       } else {
         dispatch(

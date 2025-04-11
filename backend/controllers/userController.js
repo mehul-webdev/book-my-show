@@ -1,4 +1,5 @@
 const userModel = require("../models/userSchema");
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -62,18 +63,38 @@ const loginUser = async (req, res) => {
     const token = jwt.sign(
       { userId: user.user_id, email: user.email },
       process.env.SECRET_KEY,
-      { expiresIn: "1d" }
+      { expiresIn: "1m" }
     );
 
-    res.status(200).json({
-      success: true,
-      message: "Login successful",
-      data: token,
-    });
+    return res
+      .cookie("access_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      })
+      .status(200)
+      .json({
+        message: "Logged in successfully",
+        success: true,
+      });
+
+    // res.status(200).json({
+    //   success: true,
+    //   message: "Login successful",
+    //   data: token,
+    // });
   } catch (error) {
     error.message = "Invalid credentials";
     next(error);
   }
+};
+
+const handleUserLogout = async (req, res) => {
+  res.clearCookie("access_token", {
+    httpOnly: true,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+  res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
 const handleCurrentUser = async (req, res) => {
@@ -87,6 +108,7 @@ const handleCurrentUser = async (req, res) => {
     res.status(200).json({
       message: "User Details Fetched Successfully",
       user,
+      success: true,
     });
   } catch (e) {
     next(e);
@@ -97,4 +119,5 @@ module.exports = {
   registerUser,
   loginUser,
   handleCurrentUser,
+  handleUserLogout,
 };

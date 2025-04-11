@@ -3,9 +3,15 @@ const connectDb = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
+
+// app.use("/", (req, res) => {
+//   res.json({ message: "Hello World" });
+// });
 
 app.use("/bms/v1/users", userRoutes);
 connectDb();
