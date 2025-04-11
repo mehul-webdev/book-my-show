@@ -13,7 +13,6 @@ const Login = () => {
   const onFinish = async (values) => {
     try {
       const response = await LoginUser(values);
-      console.log("the respose is", response);
 
       if (response?.success) {
         dispatch(
@@ -22,6 +21,8 @@ const Login = () => {
             content: response?.message || "Login Success",
           })
         );
+        localStorage.setItem("toekForBMS", response?.data);
+
         navigate("/");
       } else {
         dispatch(

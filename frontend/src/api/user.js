@@ -21,3 +21,16 @@ export const LoginUser = async (values) => {
     );
   }
 };
+
+export const GetCurrentUser = async (values) => {
+  try {
+    const response = await axiosInstance.post("/users/getCurrentUser", values);
+    return response.data;
+  } catch (err) {
+    return (
+      err.response?.data || {
+        massage: "Something went wrong",
+      }
+    );
+  }
+};
