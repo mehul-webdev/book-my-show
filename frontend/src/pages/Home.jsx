@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GetCurrentUser } from "../api/user";
 import { useDispatch } from "react-redux";
+import { Button } from "antd";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -12,7 +13,9 @@ const Home = () => {
   const getValidUser = async () => {
     try {
       const response = await GetCurrentUser();
-      setUserInfo(response?.data);
+      if (response.success) {
+        setUserInfo(response?.data);
+      }
     } catch (e) {
       dispatch(
         setMessage({
@@ -25,7 +28,6 @@ const Home = () => {
 
   useEffect(() => {
     if (localStorage.getItem("tokenForBMS")) {
-      console.log("herte working");
       getValidUser();
       return;
     } else {
@@ -33,9 +35,15 @@ const Home = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("tokenForBMS");
+    navigate("/login");
+  };
+
   return (
     <div>
       <Link to="/login">Login</Link>
+      <Button onClick={handleLogout}>Logout </Button>
     </div>
   );
 };
