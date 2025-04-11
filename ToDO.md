@@ -11,3 +11,8 @@
    b. https://clerk.com/blog/oauth2-react-user-authorization
 
 2. Intergrate LLM : https://ai.google.dev/gemini-api/docs#javascript
+
+<!-- Questions -->
+
+1. We are storing jwt in cookie then whenever i am doing API call it will show in request header?
+2. Can we hide JWT token?

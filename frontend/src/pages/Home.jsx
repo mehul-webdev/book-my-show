@@ -10,6 +10,7 @@ import { setMessage } from "../store/ui";
 const Home = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
   const navigate = useNavigate();
 
   const getValidUser = useCallback(async () => {
@@ -17,7 +18,7 @@ const Home = () => {
       setLoading(true);
       const response = await GetCurrentUser();
       if (response.success) {
-        console.log("jhello");
+        setUserInfo(response.user);
       } else {
         throw new Error("Unauthorized");
       }
@@ -61,7 +62,13 @@ const Home = () => {
       ) : (
         <div>
           <Link to="/login">Login</Link>
-          <Button onClick={handleLogout}>Logout </Button>
+          <div>
+            <p>Name: {userInfo.name}</p>
+            <p>Email: {userInfo.email}</p>
+          </div>
+          <Button type="primary" size="small" onClick={handleLogout}>
+            Logout{" "}
+          </Button>
         </div>
       )}
     </>
