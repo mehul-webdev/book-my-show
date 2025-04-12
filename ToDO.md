@@ -1,7 +1,7 @@
 # Client Side:
 
-1. cookie Authentication
-   2- Factor Authentication (email otp based authentication)
+1. cookie Authentication - done
+   2- Factor Authentication (email otp based authentication) - done
 2. Theme related CSS
 
 #To Read:

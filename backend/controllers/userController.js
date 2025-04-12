@@ -54,8 +54,6 @@ const loginUser = async (req, res, next) => {
       user.password
     );
 
-    console.log("here working", validatePassword, req?.body?.password);
-
     if (!validatePassword) {
       return res.status(400).json({
         success: false,
