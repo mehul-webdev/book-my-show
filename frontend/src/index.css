@@ -321,3 +321,15 @@ hr {
   display: block !important;
   opacity: 1 !important;
 }
+
+.custom-otp .ant-input {
+  margin-right: 50px;
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.custom-otp .ant-input:last-child {
+  margin-right: 0;
+}

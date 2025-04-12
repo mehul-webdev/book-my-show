@@ -2,6 +2,7 @@ const userModel = require("../models/userSchema");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../middlewares/sendEmails");
 
 const registerUser = async (req, res, next) => {
   try {
@@ -35,7 +36,7 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
     const user = await userModel.findOne({
       email: req?.body?.email,
@@ -53,12 +54,77 @@ const loginUser = async (req, res) => {
       user.password
     );
 
+    console.log("here working", validatePassword, req?.body?.password);
+
     if (!validatePassword) {
       return res.status(400).json({
         success: false,
         message: "Invalid credentials",
       });
     }
+
+    // Send Email
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const salt = await bcrypt.genSalt(10);
+    const hashedOtp = await bcrypt.hash(otp, salt);
+    user.otp = hashedOtp;
+    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+
+    await user.save();
+
+    const mailReq = {
+      body: {
+        to: req.body.email,
+        subject: "Your OTP for Login",
+        html: `<h3>Hello ${
+          user.name || "User"
+        },</h3><p>Your OTP is: <strong>${otp}</strong></p><p>This OTP is valid for 5 minutes.</p>`,
+      },
+    };
+
+    sendEmail(mailReq, res, (err) => {
+      if (err) return next(err);
+      res.status(200).json({
+        success: true,
+        message: "Correct password. OTP has been sent to your email.",
+      });
+    });
+  } catch (error) {
+    // error.message = "Something Went wrong";
+    console.log(error);
+    next(error);
+  }
+};
+
+const handleValidateOtp = async (req, res, next) => {
+  try {
+    const { otp, email } = req.body;
+
+    const user = await userModel.findOne({ email });
+
+    if (!user || !user.otp || !user.otpExpires) {
+      return res
+        .status(400)
+        .json({ message: "OTP not requested or user not found." });
+    }
+
+    if (user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "OTP has expired." });
+    }
+
+    const isMatch = await bcrypt.compare(otp, user.otp);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Invalid OTP",
+        success: false,
+      });
+    }
+
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
 
     const token = jwt.sign(
       { userId: user, email: user.email },
@@ -82,10 +148,19 @@ const loginUser = async (req, res) => {
     //   message: "Login successful",
     //   data: token,
     // });
-  } catch (error) {
-    error.message = "Invalid credentials";
-    next(error);
+
+    // return res.status(200).json({
+    //   message: "Login Successful",
+    //   success: true,
+    // });
+  } catch (e) {
+    next(e);
   }
+
+  res.status(200).json({
+    message: "Valid OTP",
+    success: true,
+  });
 };
 
 const handleUserLogout = async (req, res) => {
@@ -121,9 +196,31 @@ const handleCurrentUser = async (req, res) => {
   }
 };
 
+const handleCheckUserLoggedIn = (req, res, next) => {
+  try {
+    const token = req.cookies.access_token;
+
+    if (!token) {
+      res.status(401).json({
+        success: false,
+        message: "Please login",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Already Logged In",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   handleCurrentUser,
   handleUserLogout,
+  handleValidateOtp,
+  handleCheckUserLoggedIn,
 };

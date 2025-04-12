@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GetCurrentUser, HandleUserLogout } from "../api/user";
 import { useDispatch } from "react-redux";
 import { Button } from "antd";
@@ -11,6 +11,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState({});
+
   const navigate = useNavigate();
 
   const getValidUser = useCallback(async () => {
@@ -24,11 +25,11 @@ const Home = () => {
       }
     } catch (err) {
       navigate("/login");
-      console.log("error is", err);
       dispatch(
         setMessage({
           type: "error",
-          content: "Unauthorized access. Please login.",
+          // eslint-disable-next-line no-constant-binary-expression
+          content: "Unauthorized access. Please login." || err.message,
         })
       );
     } finally {
@@ -37,7 +38,6 @@ const Home = () => {
   }, [dispatch, navigate]);
 
   useEffect(() => {
-    console.log("inside effect");
     getValidUser();
   }, [getValidUser]);
 
@@ -60,8 +60,7 @@ const Home = () => {
       {loading ? (
         <h1>Loading....</h1>
       ) : (
-        <div>
-          <Link to="/login">Login</Link>
+        <>
           <div>
             <p>Name: {userInfo.name}</p>
             <p>Email: {userInfo.email}</p>
@@ -69,7 +68,7 @@ const Home = () => {
           <Button type="primary" size="small" onClick={handleLogout}>
             Logout{" "}
           </Button>
-        </div>
+        </>
       )}
     </>
   );
