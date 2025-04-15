@@ -8,6 +8,8 @@ const Message = () => {
   const { content, type } = useSelector((state) => state.ui.message);
   const dispatch = useDispatch();
 
+  console.log("here working");
+
   useEffect(() => {
     if (content && type) {
       messageApi.open({ type, content });
@@ -18,7 +20,7 @@ const Message = () => {
         dispatch(clearMessage());
       }
     };
-  }, [content, type]);
+  }, [content, dispatch, messageApi, type]);
 
   return <>{contextHolder}</>;
 };

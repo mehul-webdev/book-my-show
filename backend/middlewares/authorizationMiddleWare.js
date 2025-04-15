@@ -22,6 +22,7 @@ const validateJWTToken = (req, res, next) => {
     req.body = {
       email: decodedToken?.email,
       userId: decodedToken?.userId,
+      data: { ...req.body },
     };
 
     next();

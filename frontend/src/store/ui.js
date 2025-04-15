@@ -7,6 +7,9 @@ const uiSlice = createSlice({
       type: "",
       content: "",
     },
+    loader: {
+      loading: false,
+    },
   },
   reducers: {
     setMessage: (state, action) => {
@@ -18,9 +21,16 @@ const uiSlice = createSlice({
         content: "",
       };
     },
+    showLoading: (state) => {
+      state.loader.loading = true;
+    },
+    hideLoading: (state) => {
+      state.loader.loading = false;
+    },
   },
 });
 
-export const { setMessage, clearMessage } = uiSlice.actions;
+export const { setMessage, clearMessage, showLoading, hideLoading } =
+  uiSlice.actions;
 
 export default uiSlice.reducer;

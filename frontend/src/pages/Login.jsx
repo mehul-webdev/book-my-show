@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { setMessage } from "../store/ui";
 
 import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
+import Message from "../components/Message/Message";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -116,6 +117,7 @@ const Login = () => {
 
   return (
     <div className="App-header">
+      <Message />
       <main className="main-area mw-500 text-center px-3">
         <section>
           <h1>Login to BookMyShow</h1>
